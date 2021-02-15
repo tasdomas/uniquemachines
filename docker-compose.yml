@@ -1,0 +1,16 @@
+version: '3.4'
+services:
+  client:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: client
+    restart: always
+    network_mode: host
+  clone:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      target: clone
+    restart: always
+    network_mode: host
