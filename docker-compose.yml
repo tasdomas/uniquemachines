@@ -1,16 +1,24 @@
 version: '3.4'
 services:
+  server:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.server
+    ports:
+      - "8080:8080"
   client:
     build:
       context: .
       dockerfile: ./Dockerfile
       target: client
     restart: always
-    network_mode: host
+    environment:
+      SERVER: http://server:8080
   clone:
     build:
       context: .
       dockerfile: ./Dockerfile
       target: clone
     restart: always
-    network_mode: host
+    environment:
+      SERVER: http://server:8080

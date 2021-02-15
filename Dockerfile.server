@@ -1,0 +1,23 @@
+FROM ubuntu:20.04 AS build-env
+
+# Install deps
+RUN apt-get -qq update && apt-get -qq install -y curl git gcc build-essential ca-certificates
+
+# Install go
+RUN curl -sS -O https://storage.googleapis.com/golang/go1.14.2.linux-amd64.tar.gz
+RUN tar -C /usr/local -xzf go1.14.2.linux-amd64.tar.gz
+ENV PATH /usr/local/go/bin:$PATH
+ENV GO111MODULE=on
+
+RUN mkdir /src
+WORKDIR /src
+
+COPY . .
+
+RUN go build -o srv ./server
+
+FROM ubuntu:20.04 AS server
+RUN apt-get -qq update && apt-get -qq install -y ca-certificates
+WORKDIR /root/
+COPY --from=build-env /src/srv .
+CMD ["./srv"]

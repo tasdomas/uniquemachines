@@ -14,13 +14,18 @@ import (
 	"gopkg.in/errgo.v1"
 )
 
-const upstream = "http://localhost:8080"
+const defaultServer = "http://localhost:8080"
 
-const pingInterval = time.Second * 15
+const pingInterval = time.Second * 5
 
 func main() {
 	var st *status
 	var err error
+
+	serverURL := os.Getenv("SERVER")
+	if serverURL == "" {
+		serverURL = defaultServer
+	}
 
 	st, err = loadStatus()
 	if os.IsNotExist(errgo.Cause(err)) {
@@ -42,7 +47,7 @@ func main() {
 	} else if err != nil {
 		log.Fatal(err)
 	}
-	run(st, pingInterval)
+	run(st, serverURL, pingInterval)
 }
 
 func getMachineId() (string, error) {
@@ -128,14 +133,14 @@ func (st *status) ping(upstream string, newToken string) error {
 }
 
 // run periodically pings upstream server with new token.
-func run(st *status, d time.Duration) error {
+func run(st *status, server string, d time.Duration) error {
 	t := time.NewTicker(d)
 	defer t.Stop()
 	for {
 		select {
 		case <-t.C:
 			newToken := uuid.New().String()
-			err := st.ping(upstream, newToken)
+			err := st.ping(server, newToken)
 			if err != nil {
 				log.Printf("error pinging upstream %v", err)
 				continue
