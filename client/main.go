@@ -14,8 +14,12 @@ import (
 	"gopkg.in/errgo.v1"
 )
 
+// defaultServer is the server URL the client will try to ping
+// if one is not defined with the SERVER environment variable.
 const defaultServer = "http://localhost:8080"
 
+// pingInterval defines how often a client will ping the server
+// with a new token.
 const pingInterval = time.Second * 5
 
 func main() {
@@ -50,6 +54,9 @@ func main() {
 	run(st, serverURL, pingInterval)
 }
 
+// getMachineId retrieves the machine id stored in
+// /etc/machine-id. This will be used as the initial machine
+// id if the client's token file does not exist (first run).
 func getMachineId() (string, error) {
 	f, err := os.Open("/etc/machine-id")
 	if err != nil {

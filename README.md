@@ -3,6 +3,8 @@ Detecting cloned machine instances
 
 This is a POC implementation of a service for counting unique machines.
 
+It uses single-use tokens to detect cloned vm instances.
+
 Running
 =======
 

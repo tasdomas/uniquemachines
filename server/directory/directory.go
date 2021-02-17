@@ -1,3 +1,15 @@
+// The directory package contains the main cloned machine detecting
+// logic of the server.
+//
+// It works by keeping track of the last token presented by each machine.
+// On each request, the client application running on a machine will
+// present the previously valid token and a freshly generated one.
+// If the token matches the one recorded by the server, the record is updated.
+// If the token does not match, the machine is treated as a clone - a
+// new record is created for it, increasing the unique machine count.
+//
+// Since machine records expire, inactive machines do not effect the
+// count.
 package directory
 
 import (
@@ -10,12 +22,14 @@ import (
 // Maximum age at which a machine is no longer considered alive.
 const maxAge = time.Minute
 
+// Directory tracks unique machines.
 type Directory struct {
 	m sync.Mutex
 
 	machines map[string]machineEntry
 }
 
+// New returns a new Directory instance.
 func New() *Directory {
 	return &Directory{
 		machines: make(map[string]machineEntry),
